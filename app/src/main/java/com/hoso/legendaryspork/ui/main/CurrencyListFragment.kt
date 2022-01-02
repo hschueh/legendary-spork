@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.hoso.legendaryspork.R
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.hoso.legendaryspork.databinding.CurrencyListFragmentBinding
 
 class CurrencyListFragment : Fragment() {
@@ -18,6 +18,7 @@ class CurrencyListFragment : Fragment() {
     private lateinit var viewModel: CurrencyViewModel
     private var _binding: CurrencyListFragmentBinding? = null
     private val binding: CurrencyListFragmentBinding get() = _binding!!
+    private var adapter: CurrencyListAdapter = CurrencyListAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +37,26 @@ class CurrencyListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(CurrencyViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel.fetchCurrencyList()
+        initView()
+        initViewListener()
+        initObserver()
+    }
+
+    private fun initView() {
+        binding.currencyList.layoutManager = LinearLayoutManager(requireContext())
+        binding.currencyList.adapter = adapter
+    }
+
+    fun initViewListener() {
+    }
+
+    fun initObserver() {
+        viewModel.currencyList.observe(
+            viewLifecycleOwner,
+            {
+                adapter.submitList(it)
+            }
+        )
     }
 }
