@@ -19,35 +19,42 @@ class CurrencyViewModel : ViewModel() {
         _order.postValue(!(_order.value ?: false))
     }
 
-    val currencyList: LiveData<List<CurrencyInfo>> = MediatorLiveData<List<CurrencyInfo>>().apply {
-        addSource(
-            _order
-        ) { order ->
-            this.postValue(
-                if (order) {
-                    _currencyList.value?.sortedBy { it.id }
-                } else {
-                    _currencyList.value?.sortedByDescending { it.id }
-                }
-            )
-        }
-        addSource(
-            _currencyList
-        ) { list ->
-            val order = _order.value
-            this.postValue(
-                when {
-                    order == null -> {
-                        list
+    val currencyList: LiveData<List<CurrencyInfo>> = CurrencyListMediatorLiveData(_currencyList, _order)
+
+    inner class CurrencyListMediatorLiveData(
+        private val currencyLiveData: MutableLiveData<List<CurrencyInfo>>,
+        private val orderLiveData: MutableLiveData<Boolean>
+    ) : MediatorLiveData<List<CurrencyInfo>>() {
+        init {
+            addSource(
+                orderLiveData
+            ) { order ->
+                this.postValue(
+                    if (order) {
+                        currencyLiveData.value?.sortedBy { it.id }
+                    } else {
+                        currencyLiveData.value?.sortedByDescending { it.id }
                     }
-                    order -> {
-                        list.sortedBy { it.id }
+                )
+            }
+            addSource(
+                currencyLiveData
+            ) { list ->
+                val order = orderLiveData.value
+                this.postValue(
+                    when {
+                        order == null -> {
+                            list
+                        }
+                        order -> {
+                            list.sortedBy { it.id }
+                        }
+                        else -> {
+                            list.sortedByDescending { it.id }
+                        }
                     }
-                    else -> {
-                        list.sortedByDescending { it.id }
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }
