@@ -49,6 +49,12 @@ class CurrencyListFragment : Fragment() {
     }
 
     fun initViewListener() {
+        binding.sort.setOnClickListener {
+            viewModel.toggleCurrencyListOrder()
+        }
+        binding.fetch.setOnClickListener {
+            // fetch
+        }
     }
 
     fun initObserver() {

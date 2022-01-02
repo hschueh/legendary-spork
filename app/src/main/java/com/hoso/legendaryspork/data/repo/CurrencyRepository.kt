@@ -1,4 +1,4 @@
-package com.hoso.legendaryspork.data
+package com.hoso.legendaryspork.data.repo
 
 import com.hoso.legendaryspork.data.model.CurrencyInfo
 import com.hoso.legendaryspork.util.toDataClassList
