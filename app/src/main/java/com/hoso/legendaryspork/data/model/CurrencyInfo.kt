@@ -1,7 +1,11 @@
 package com.hoso.legendaryspork.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class CurrencyInfo(
-    val id: String,
+    @PrimaryKey val id: String,
     val name: String,
     val symbol: String
 ) {

@@ -1,84 +1,39 @@
 package com.hoso.legendaryspork.data.repo
 
+import android.content.Context
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.hoso.legendaryspork.data.mock.CurrencyInfoDataSourceMock
 import com.hoso.legendaryspork.data.model.CurrencyInfo
-import com.hoso.legendaryspork.util.toDataClassList
-import kotlinx.coroutines.coroutineScope
+import com.hoso.paypaycurrencyex.data.db.AppDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 object CurrencyRepository {
-    suspend fun getCurrencyList(): List<CurrencyInfo> = coroutineScope {
-        return@coroutineScope """
-          [
-            {
-            "id": "BTC",
-            "name": "Bitcoin",
-            "symbol": "BTC"
-            },
-            {
-            "id": "ETH",
-            "name": "Ethereum",
-            "symbol": "ETH"
-            },
-            {
-            "id": "XRP",
-            "name": "XRP",
-            "symbol": "XRP"
-            },
-            {
-            "id": "BCH",
-            "name": "Bitcoin Cash",
-            "symbol": "BCH"
-            },
-            {
-            "id": "LTC",
-            "name": "Litecoin",
-            "symbol": "LTC"
-            },
-            {
-            "id": "EOS",
-            "name": "EOS",
-            "symbol": "EOS"
-            },
-            {
-            "id": "BNB",
-            "name": "Binance Coin",
-            "symbol": "BNB"
-            },
-            {
-            "id": "LINK",
-            "name": "Chainlink",
-            "symbol": "LINK"
-            },
-            {
-            "id": "NEO",
-            "name": "NEO",
-            "symbol": "NEO"
-            },
-            {
-            "id": "ETC",
-            "name": "Ethereum Classic",
-            "symbol": "ETC"
-            },
-            {
-            "id": "ONT",
-            "name": "Ontology",
-            "symbol": "ONT"
-            },
-            {
-            "id": "CRO",
-            "name": "Crypto.com Chain",
-            "symbol": "CRO"
-            },
-            {
-            "id": "CUC",
-            "name": "Cucumber",
-            "symbol": "CUC"
-            },
-            {
-            "id": "USDC",
-            "name": "USD Coin",
-            "symbol": "USDC"
+    lateinit var db: AppDatabase
+
+    private val callback = object : RoomDatabase.Callback() {
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+            CoroutineScope(Dispatchers.IO).launch {
+                fetchAndUpdateData()
             }
-          ]
-        """.trimIndent().toDataClassList<CurrencyInfo>()
+        }
+    }
+    fun init(applicationContext: Context) {
+        db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java, "cdc_db",
+        ).addCallback(callback).build()
+    }
+
+    suspend fun getCurrencyList(): List<CurrencyInfo> {
+        return db.currencyDao().getCurrencies()
+    }
+
+    suspend fun fetchAndUpdateData() {
+        db.currencyDao().insertCurrencies(*CurrencyInfoDataSourceMock.getCurrencyList().toTypedArray())
     }
 }

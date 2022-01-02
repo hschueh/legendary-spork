@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.hoso.legendaryspork.data.model.CurrencyInfo
 import com.hoso.legendaryspork.databinding.CurrencyListFragmentBinding
 
-class CurrencyListFragment : Fragment() {
+class CurrencyListFragment : Fragment(), CurrencyListAdapter.CurrencyInfoSelectionCallback {
 
     companion object {
         fun newInstance() = CurrencyListFragment()
@@ -18,7 +20,9 @@ class CurrencyListFragment : Fragment() {
     private lateinit var viewModel: CurrencyViewModel
     private var _binding: CurrencyListFragmentBinding? = null
     private val binding: CurrencyListFragmentBinding get() = _binding!!
-    private var adapter: CurrencyListAdapter = CurrencyListAdapter()
+    private var adapter: CurrencyListAdapter = CurrencyListAdapter().apply {
+        callback = this@CurrencyListFragment
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,6 +34,7 @@ class CurrencyListFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.currencyList?.adapter = null
         _binding = null
         super.onDestroyView()
     }
@@ -37,7 +42,6 @@ class CurrencyListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(CurrencyViewModel::class.java)
-        viewModel.fetchCurrencyList()
         initView()
         initViewListener()
         initObserver()
@@ -53,7 +57,7 @@ class CurrencyListFragment : Fragment() {
             viewModel.toggleCurrencyListOrder()
         }
         binding.fetch.setOnClickListener {
-            // fetch
+            viewModel.fetchCurrencyList()
         }
     }
 
@@ -64,5 +68,13 @@ class CurrencyListFragment : Fragment() {
                 adapter.submitList(it)
             }
         )
+    }
+
+    override fun onSelect(info: CurrencyInfo) {
+        Snackbar.make(
+            binding.root,
+            "Currency ${info.name} selected!",
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 }

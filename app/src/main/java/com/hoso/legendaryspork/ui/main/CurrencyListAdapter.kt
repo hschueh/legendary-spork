@@ -19,6 +19,12 @@ class CurrencyListAdapter : ListAdapter<CurrencyInfo, CurrencyListAdapter.Curren
         }
     }
 
+    interface CurrencyInfoSelectionCallback {
+        fun onSelect(info: CurrencyInfo)
+    }
+
+    var callback: CurrencyInfoSelectionCallback? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyListAdapter.CurrencyViewHolder {
         return CurrencyViewHolder(
             CurrencyItemBinding.inflate(
@@ -31,6 +37,11 @@ class CurrencyListAdapter : ListAdapter<CurrencyInfo, CurrencyListAdapter.Curren
 
     override fun onBindViewHolder(holder: CurrencyListAdapter.CurrencyViewHolder, position: Int) {
         holder.currencyInfo = getItem(position)
+        holder.binding.root.setOnClickListener {
+            holder.currencyInfo?.let {
+                callback?.onSelect(it)
+            }
+        }
     }
 
     inner class CurrencyViewHolder(val binding: CurrencyItemBinding) : RecyclerView.ViewHolder(binding.root) {

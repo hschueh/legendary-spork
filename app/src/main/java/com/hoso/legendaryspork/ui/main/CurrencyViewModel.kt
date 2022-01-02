@@ -36,12 +36,16 @@ class CurrencyViewModel : ViewModel() {
         ) { list ->
             val order = _order.value
             this.postValue(
-                if (order == null) {
-                    list
-                } else if (order) {
-                    list.sortedBy { it.id }
-                } else {
-                    list.sortedByDescending { it.id }
+                when {
+                    order == null -> {
+                        list
+                    }
+                    order -> {
+                        list.sortedBy { it.id }
+                    }
+                    else -> {
+                        list.sortedByDescending { it.id }
+                    }
                 }
             )
         }
