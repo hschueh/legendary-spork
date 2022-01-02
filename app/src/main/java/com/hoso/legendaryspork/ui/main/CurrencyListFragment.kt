@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.hoso.legendaryspork.R
+import com.hoso.legendaryspork.databinding.CurrencyListFragmentBinding
 
 class CurrencyListFragment : Fragment() {
 
@@ -15,17 +16,25 @@ class CurrencyListFragment : Fragment() {
     }
 
     private lateinit var viewModel: CurrencyViewModel
+    private var _binding: CurrencyListFragmentBinding? = null
+    private val binding: CurrencyListFragmentBinding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.currency_list_fragment, container, false)
+        _binding = CurrencyListFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(CurrencyViewModel::class.java)
         // TODO: Use the ViewModel
     }
