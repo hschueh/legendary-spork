@@ -21,7 +21,7 @@ class CurrencyViewModel : ViewModel() {
 
     val currencyList: LiveData<List<CurrencyInfo>> = CurrencyListMediatorLiveData(_currencyList, _order)
 
-    inner class CurrencyListMediatorLiveData(
+    class CurrencyListMediatorLiveData(
         private val currencyLiveData: MutableLiveData<List<CurrencyInfo>>,
         private val orderLiveData: MutableLiveData<Boolean>
     ) : MediatorLiveData<List<CurrencyInfo>>() {
